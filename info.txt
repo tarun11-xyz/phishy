@@ -1,0 +1,7 @@
+sender policy framework
+Domain key identified Mail
+Domain based message authetication reporting conformance
+
+
+Minimize the output 
+give one word warning/output with popup that has gives overall info to trust or not

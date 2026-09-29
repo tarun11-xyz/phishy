@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Phishy : Email Investigation</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}"
+>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400;0,17..18,500;0,17..18,600;0,17..18,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <header class="navbar">
+      <a class="brand" href="#">Phishy</a>
+      <nav>
+        <a href="#audit">Analyze</a><a href="#about">How it works</a><button class="nav-reports" id="recentReportsBtn" type="button">Recent reports</button>
+      </nav>
+      <a class="nav-cta" href="#audit">Analyze email <span>↗</span></a>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="hero-glow glow-one"></div>
+        <div class="hero-glow glow-two"></div>
+        <div class="hero-copy">
+          <h1>Know what’s hiding<br />inside an <em>email</em></h1>
+          <p class="lead">
+            Phishy dissects suspicious messages into clear, defensible evidence : 
+            sender identity, Reply-To, URLs, SPF, DKIM, DMARC, urgency and
+            attachments.
+          </p>
+          <div class="hero-actions">
+            <a href="#audit" class="hero-primary"
+              >Investigate an email <span>→</span></a
+            ><button id="heroSampleBtn" class="hero-secondary" type="button">
+              Try suspicious sample
+            </button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="mail-window">
+            <div class="window-top">
+              <div class="window-dots"><i></i><i></i><i></i></div>
+              <span>MESSAGE INSPECTION</span><b>•••</b>
+            </div>
+            <div class="mail-meta">
+              <small>FROM</small><strong>security@college-support.xyz</strong
+              ><small>REPLY-TO</small
+              ><strong class="danger-text">resetdesk@account-verify.top</strong>
+            </div>
+            <div class="mail-subject">
+              URGENT: Verify now — password expires today
+            </div>
+            <div class="scan-line"></div>
+            <div class="signal-row">
+              <div>
+                <span class="signal fail">!</span>
+                <p>
+                  <b>Identity mismatch</b
+                  ><small>Sender and reply domain differ</small>
+                </p>
+              </div>
+              <strong>+20</strong>
+            </div>
+            <div class="signal-row">
+              <div>
+                <span class="signal fail">!</span>
+                <p>
+                  <b>Authentication failed</b><small>SPF · DKIM · DMARC</small>
+                </p>
+              </div>
+              <strong>+45</strong>
+            </div>
+            <div class="signal-row">
+              <div>
+                <span class="signal warn">↗</span>
+                <p>
+                  <b>Suspicious link</b><small>Misleading domain pattern</small>
+                </p>
+              </div>
+              <strong>+15</strong>
+            </div>
+            <div class="visual-footer">
+              <span>RISK SIGNAL</span><b>HIGH</b
+              ><strong>100<span>/100</span></strong>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="proof-strip">
+        <span>EMAIL</span><i>→</i><span>DISSECTION</span><i>→</i
+        ><span>EVIDENCE</span><i>→</i><span>RISK</span>
+        <p>No black-box verdict. See exactly what triggered the score.</p>
+      </section>
+      <section class="workspace" id="audit">
+        <div class="input-card">
+          <div class="section-head">
+            <div>
+              <h2>Drop in the evidence</h2>
+              <p>
+                Upload a real <code>.eml</code> or paste the message and
+                headers.
+              </p>
+            </div>
+            <button id="sampleBtn" class="ghost">Load suspicious sample</button>
+          </div>
+          <div class="tabs">
+            <button class="tab active" data-tab="upload">Upload .eml</button
+            ><button class="tab" data-tab="paste">Paste email / headers</button>
+          </div>
+          <form id="analysisForm">
+            <div id="uploadPanel" class="tab-panel active">
+              <label class="dropzone" id="dropzone"
+                ><input
+                  id="emailFile"
+                  type="file"
+                  name="email_file"
+                  accept=".eml" /><span class="upload-icon">↑</span
+                ><b>Drop an .eml file here</b
+                ><small>or click to browse · max 5 MB</small
+                ><span id="fileName"></span
+              ></label>
+            </div>
+            <div id="pastePanel" class="tab-panel">
+              <textarea
+                id="emailText"
+                name="email_text"
+                placeholder="Paste complete email content or headers here..."
+              ></textarea>
+            </div>
+            <button class="primary" type="submit">
+              <span>Run investigation</span><b>→</b>
+            </button>
+            <p id="formError" class="error"></p>
+          </form>
+        </div>
+        <div class="result-card" id="evidence">
+          <div class="empty" id="emptyState">
+            <!-- <div class="radar"><span></span></div>
+            <p class="eyebrow">INVESTIGATION RESULT</p> -->
+            <h3>Your evidence board is ready.</h3>
+            <p>
+              Analyze a message to reveal identity signals, authentication
+              results, suspicious links and a transparent risk score.
+            </p>
+            <div class="empty-chips">
+              <span>Sender</span><span>URLs</span><span>Auth</span><span>Language</span>
+            </div>
+          </div>
+
+          <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <b>Dissecting message…</b>
+            <span>Checking identity, links and authentication evidence</span>
+          </div>
+
+          <div id="results" class="result-panel hidden">
+            <div class="result-head">
+              <div class="result-title">
+                <!-- <span class="result-label">ANALYSIS RESULT</span> -->
+                <h2 id="resultSubject">Email analysis result</h2>
+              </div>
+              <div class="risk-wrap">
+                <span id="riskBadge" class="risk-badge">LOW RISK</span>
+                <div class="risk-ring" id="riskRing">
+                  <strong id="riskScore">0</strong><small>/100</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="quick-verdict" id="quickVerdict">
+              <div>
+                <small>OVERALL RESULT</small>
+                <strong id="quickVerdictWord">CHECK</strong>
+                <p id="quickVerdictText">Review the result before interacting with this email.</p>
+              </div>
+              <button class="details-toggle" id="detailsToggle" type="button" aria-expanded="false">View details</button>
+            </div>
+
+            <div class="result-details hidden" id="resultDetails">
+            <div class="sender-line">
+              <div class="sender-icon">@</div>
+              <div class="sender-copy">
+                <small>SENDER ANALYSIS</small>
+                <p id="senderSummary">Sender information analyzed</p>
+              </div>
+            </div>
+
+            <h3 class="subhead">Email header forensics</h3>
+            <div class="forensics-panel">
+              <div class="forensics-grid" id="forensicsGrid"></div>
+              <div class="identity-checks" id="identityChecks"></div>
+            </div>
+
+            <h3 class="subhead">Risk score calculation</h3>
+            <div class="score-breakdown" id="scoreBreakdown"></div>
+
+            <h3 class="subhead">Authentication</h3>
+            <div class="auth-grid" id="authGrid"></div>
+
+            <h3 class="subhead">Evidence timeline</h3>
+            <div id="evidenceList" class="evidence-list"></div>
+
+            <div id="urlSection">
+              <h3 class="subhead">URL inspection</h3>
+              <div id="urlList" class="url-list"></div>
+            </div>
+
+            <div class="recommendation">
+              <div class="recommendation-title"><span>!</span><b>Safety recommendation</b></div>
+              <p id="recommendation"></p>
+            </div>
+
+            </div>
+
+            <div class="report-actions">
+              <button class="save-report-btn" id="saveReportBtn" type="button"><span>Save report</span><span>＋</span></button>
+              <a class="report-link" href="/report"><span>Export PDF</span><span>↗</span></a>
+            </div>
+            <p class="save-status" id="saveStatus"></p><button class="view-reports-btn" id="resultRecentReportsBtn" type="button">View recent reports</button>
+          </div>
+        </div>
+      </section>
+      <section class="explain" id="about">
+        <div class="explain-head">
+          <!-- <p class="eyebrow">HOW PHISHY THINKS</p> -->
+          <h2>From raw email to<br /><span>explainable evidence</span></h2>
+          <p>
+            Designed for Checking if an email is suspicious, Phishy breaks down the message into clear evidence.
+          </p>
+        </div>
+        <div class="steps">
+          <article>
+            <span>01</span><b>Parse the message</b>
+            <p>
+              Extract headers, sender data, body content, links and attachments.
+            </p>
+          </article>
+          <article>
+            <span>02</span><b>Inspect the signals</b>
+            <p>
+              Compare identities and inspect URL, authentication and language
+              patterns.
+            </p>
+          </article>
+          <article>
+            <span>03</span><b>Score the evidence</b>
+            <p>
+              Add transparent risk points only when an indicator is actually
+              detected.
+            </p>
+          </article>
+          <article>
+            <span>04</span><b>Explain the verdict</b>
+            <p>
+              Surface every finding with context and practical safety guidance.
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
+    <div class="verdict-overlay hidden" id="verdictOverlay" aria-hidden="true">
+      <div class="verdict-popup" role="dialog" aria-modal="true" aria-labelledby="verdictWord">
+        <button class="verdict-close" id="verdictClose" type="button" aria-label="Close">×</button>
+        <span class="verdict-kicker">PHISHY RESULT</span>
+        <h2 id="verdictWord">CHECK</h2>
+        <p id="verdictSummary">Review the analysis before interacting with this email.</p>
+        <div class="verdict-score"><span>Risk score</span><strong id="verdictScore">0/100</strong></div>
+        <button class="verdict-action" id="verdictDetailsBtn" type="button">View evidence</button>
+      </div>
+    </div>
+    <div class="reports-overlay hidden" id="reportsOverlay" aria-hidden="true">
+      <aside class="reports-drawer" role="dialog" aria-modal="true" aria-labelledby="reportsTitle">
+        <div class="reports-head"><div><h2 id="reportsTitle">Recent reports</h2></div><button id="closeReportsBtn" type="button" aria-label="Close">×</button></div>
+        <div class="reports-list" id="reportsList"><div class="reports-empty">No saved reports yet.</div></div>
+      </aside>
+    </div>
+    <footer>
+      <b>Phishy</b><span>Phishing Detection Prototype</span>
+      ><span>Phishy</span>
+    </footer>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+      document
+        .getElementById("heroSampleBtn")
+        ?.addEventListener("click", () => {
+          document.getElementById("sampleBtn")?.click();
+          setTimeout(
+            () =>
+              document
+                .getElementById("audit")
+                ?.scrollIntoView({ behavior: "smooth" }),
+            80,
+          );
+        });
+    </script>
+  </body>
+</html>
